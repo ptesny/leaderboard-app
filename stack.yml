@@ -1,0 +1,38 @@
+provider:
+  name: openfaas
+  gateway: http://127.0.0.1:8080
+functions:
+  leaderboard:
+    lang: golang-middleware
+    handler: ./leaderboard
+    image: leaderboard:1.1.0
+    labels:
+      com.openfaas.scale.zero: false
+    environment:
+      postgres_db: defaultdb
+      postgres_sslmode: require
+      postgres_port: 25060
+      allow_cors: https://alexellis.github.io
+    secrets:
+      - leaderboard-app-secrets
+
+  github-sub:
+    lang: golang-middleware
+    handler: ./github-sub
+    image: github-sub:1.1.0
+    labels:
+      com.openfaas.scale.zero: false
+    environment:
+      postgres_db: defaultdb
+      postgres_sslmode: require
+      postgres_port: 25060
+      enforce_hmac: true
+    secrets:
+      - leaderboard-app-secrets
+
+  leaderboard-page:
+    lang: node10-express
+    handler: ./leaderboard-page
+    image: leaderboard-page:1.1.0
+    labels:
+      com.openfaas.scale.zero: false
